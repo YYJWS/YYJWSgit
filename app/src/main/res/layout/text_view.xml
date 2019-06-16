@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         >
         <Button
+            android:id="@+id/_back1"
             android:layout_width="51dp"
             android:layout_height="51dp"
             android:background="@drawable/ic_launcher_back"
@@ -30,7 +31,7 @@
         android:layout_height="1dp"
         android:background="#000000"
         />
-    <TextView
+    <EditText
         android:id="@+id/_Ytitle_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,12 +39,19 @@
         android:textColorHint="#9E606060"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
+        android:padding="5dp"
+        />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000"
         />
     <EditText
         android:id="@+id/mainnote_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@null"
+        android:gravity="start"
         android:hint="正文"
         android:textColorHint="#9E606060"
         android:layout_marginTop="5dp"

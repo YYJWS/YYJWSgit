@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -15,7 +16,7 @@ import android.widget.Toast;
 
 public class edit extends Activity {
     private EditText editText1,editText2;
-    private Button button;
+    private Button button1,button2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,14 @@ public class edit extends Activity {
         setContentView(R.layout.edit_view);
         editText1=(EditText)findViewById(R.id._Ytitle);
         editText2=(EditText)findViewById(R.id.mainnote); 
-        button=(Button)findViewById(R.id.save);
+        button1=(Button)findViewById(R.id.save);
+        button2=(Button)findViewById(R.id._back);
+
+        editText1.setFocusable(true);
+        editText1.setFocusableInTouchMode(true);
+        editText1.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
         editText1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -46,7 +54,7 @@ public class edit extends Activity {
 
             }
         });
-        button.setOnClickListener(new View.OnClickListener() {
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 databasetest dbt= new databasetest(getApplicationContext());
@@ -58,11 +66,26 @@ public class edit extends Activity {
                 values.put("value",name);
                 dbt.add(values);
                 dbt.close();
-                Intent intent = new Intent(edit.this, MainActivity.class);
+                Intent intent = new Intent(edit.this, mainface.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+
+
+
+            }
+        });
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(edit.this, mainface.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
 
             }
         });
 
+
     }
 }
+

@@ -1,97 +1,104 @@
 package com.example.exam;
-
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.constraint.solver.ArrayLinkedVariables;
-import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
-    private FloatingActionButton fab;
-    ListView lv;
+    private EditText editText;
+    private TextView textView;
+    private Button button;
+    private String psw;
+    private String npsw;
     AlertDialog.Builder builder;
     AlertDialog alert;
-    private EditText editText;
-    private int i = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main_view);
-        lv = (ListView) findViewById(R.id.NoteList);
-        fab = (FloatingActionButton) findViewById(R.id.add_note);
-        fab.setOnClickListener(new View.OnClickListener() {
+        setContentView(R.layout.lock);
+        editText=(EditText)findViewById(R.id.psw);
+        textView=(TextView)findViewById(R.id.cancel);
+        button=(Button)findViewById(R.id.mdf);
+        final databasetest dbt=new databasetest(getApplicationContext());
+        final EditText edit = new EditText(MainActivity.this);
+        dbt.open();
+        psw=(String)dbt.findmm().get(0);
+        Log.d(TAG,psw);
+        dbt.close();
+        editText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, edit.class);
-                startActivity(intent);
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.toString().equals(psw)){
+                    Intent intent = new Intent(MainActivity.this,mainface.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
-        final databasetest dbt = new databasetest(this);
-        dbt.open();
-        ArrayAdapter<String> myadapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, dbt.findbt());
-        lv.setAdapter(myadapter);
-        dbt.close();
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                      @Override
-                                      public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-                                          String content=lv.getItemAtPosition(position).toString();
-                                          Intent intent = new Intent(MainActivity.this, view.class);
-                                          intent.putExtra("title",content);
-                                          startActivity(intent);
-
-
-                                      }
-                                  }
-        );
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                builder = new AlertDialog.Builder(MainActivity.this);
-                alert = builder.setTitle("提示")
-                        .setMessage("确认删除？")
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                builder=new AlertDialog.Builder(MainActivity.this);
+                alert=builder.setTitle("输入新密码")
+                        .setView(edit)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String content=lv.getItemAtPosition(position).toString();
+                                npsw=edit.getText().toString();
+                                ContentValues values = new ContentValues();
+                                values.put("mm",npsw);
                                 dbt.open();
-                                dbt.del(content);
+                                dbt.updatemm(values);
                                 dbt.close();
-                                ArrayAdapter<String> myadapter1 = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_expandable_list_item_1, dbt.findbt());
-                                lv.setAdapter(myadapter1);
-                            }
+                                reload();
 
-                        })
-
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
 
                             }
                         })
+                        .setNegativeButton("取消",null)
                         .create();
                 alert.show();
-                return true;
+
             }
         });
     }
+    public void reload() {
+        finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 }
-

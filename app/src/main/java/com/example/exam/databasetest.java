@@ -18,10 +18,24 @@ public class databasetest extends  SQLiteOpenHelper{
     }
 
     public void onCreate(SQLiteDatabase db){
-        String makesql="CREATE TABLE "+basename+"(id integer PRimary key autoincrement,title,value)";
+        String makesql="CREATE TABLE "+basename+"(title,value)";
+        String mm="CREATE TABLE mmb(id ,mm)";
         db.execSQL(makesql);
+        db.execSQL(mm);
+        db.execSQL("insert into mmb(id,mm) Values(1,'abcd')");
 
     }
+    public ArrayList findmm(){
+        ArrayList<String> _list2=new ArrayList();
+        SQLiteDatabase s=getReadableDatabase();
+        Cursor c=s.rawQuery("select * from mmb",null);
+        while (c.moveToNext()){
+            String mm=c.getString(c.getColumnIndex("mm"));
+            _list2.add(mm);
+        }c.close();
+        return _list2;
+    }
+
     public void open(){
         db = getReadableDatabase();
     }
@@ -38,15 +52,16 @@ public class databasetest extends  SQLiteOpenHelper{
 
     }
 
-    public ArrayList findzw(String title){
+    public ArrayList findzw(String zw){
         ArrayList<String> _list1=new ArrayList();
         SQLiteDatabase s=getReadableDatabase();
-        Cursor c=s.rawQuery("select * from note_1 Where title=?",new String[]{title});
+        Cursor c=s.rawQuery("select value from note_1 WHERE title=?",new String[]{zw});
         while (c.moveToNext()){
-            String zw=c.getString(c.getColumnIndex("value"));
-            _list1.add(zw);
+            String bt=c.getString(c.getColumnIndex("value"));
+            _list1.add(bt);
         }c.close();
         return _list1;
+
     }
 
     public void del(String ti){
@@ -54,14 +69,21 @@ public class databasetest extends  SQLiteOpenHelper{
     }
 
 
+
     public void close(){
         if (db != null){
             db.close();
         }
     }
-
     public void add(ContentValues values){
         db.insert(basename,null,values);
+    }
+    public void update(ContentValues values,String ti){
+
+        db.update(basename,values,"title=?",new String[]{ti});
+    }
+    public void updatemm(ContentValues values){
+        db.update("mmb",values,"id=1",null);
     }
 
     @Override
