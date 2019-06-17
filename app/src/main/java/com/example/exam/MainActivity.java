@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +40,8 @@ public class MainActivity extends Activity {
         textView=(TextView)findViewById(R.id.cancel);
         button=(Button)findViewById(R.id.mdf);
         final databasetest dbt=new databasetest(getApplicationContext());
-        final EditText edit = new EditText(MainActivity.this);
         dbt.open();
         psw=(String)dbt.findmm().get(0);
-        Log.d(TAG,psw);
         dbt.close();
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -72,33 +71,53 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                builder=new AlertDialog.Builder(MainActivity.this);
-                alert=builder.setTitle("输入新密码")
-                        .setView(edit)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                npsw=edit.getText().toString();
+                add();
+
+    }
+    public void add(){
+        final EditText edit1 = new EditText(MainActivity.this);
+        edit1.setHint("请输入旧密码");
+        final EditText edit2 = new EditText(MainActivity.this);
+        edit2.setHint("请输入新密码");
+        final EditText edit3 = new EditText(MainActivity.this);
+        edit3.setHint("请重复新密码");
+        LinearLayout layout=new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(edit1);
+        layout.addView(edit2);
+        layout.addView(edit3);
+        builder=new AlertDialog.Builder(MainActivity.this);
+        alert=builder.setTitle("修改密码")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(edit1.getText().toString().equals(psw)){
+                            if(edit2.getText().toString().equals(edit3.getText().toString())&&edit2.length()!=0){
+                                npsw=edit3.getText().toString();
                                 ContentValues values = new ContentValues();
                                 values.put("mm",npsw);
                                 dbt.open();
                                 dbt.updatemm(values);
                                 dbt.close();
-                                reload();
-
-
+                                finish();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
                             }
-                        })
-                        .setNegativeButton("取消",null)
-                        .create();
-                alert.show();
+                            else {
+                                Toast.makeText(getApplication(),"两次密码不一致或输入为空",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else {
+                            Toast.makeText(getApplication(),"旧密码错误",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("取消",null)
+                .create();
+        alert.show();
 
-            }
-        });
     }
-    public void reload() {
-        finish();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        });
     }
 }
